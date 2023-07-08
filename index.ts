@@ -6,7 +6,7 @@ const CLASS_BUTTON = "jq-accordion-button";
 const CLASS_BODY = "jq-accordion-body";
 const CLASS_EXPANDED = "expanded";
 const CLASS_COLLAPSED = "collapsed";
-// const CLASS_TOGGLING = "toggling"; TODO
+const CLASS_TOGGLING = "toggling";
 
 $.fn.accordion = function (this: JQuery<HTMLElement>) {
 	toggleBodiesVisibility();
@@ -73,13 +73,13 @@ namespace Item {
 			return;
 		const $element = $(element);
 		$element.trigger("accordion:beforeToggle");
-		$(getBody(element)!).slideToggle();
+		$(getBody(element)!).slideToggle(400, onSlideComplete);
 		const accordion = getAccordion(element)!;
 		if (Accordion.getMode(accordion) === "single" && !isExpanded(element)) {
 			const expandedItem = Accordion.getExpandedItem(element);
 			if (expandedItem) {
 				$(expandedItem).removeClass(CLASS_EXPANDED).addClass(CLASS_COLLAPSED);
-				$(getBody(expandedItem)!).slideUp();
+				$(getBody(expandedItem)!).slideUp(400, onSlideComplete);
 			}
 		}
 		$element.toggleClass(CLASS_COLLAPSED).toggleClass(CLASS_EXPANDED);
@@ -87,11 +87,15 @@ namespace Item {
 	}
 
 	export function isToggling(element: HTMLElement): boolean {
-		return $(getBody(element)!).is(":animated");
+		return $(getBody(element)!).hasClass(CLASS_TOGGLING);
 	}
 
 	export function isExpanded(element: HTMLElement): boolean {
 		return $(element).hasClass(CLASS_EXPANDED);
+	}
+
+	function onSlideComplete(this: HTMLElement): void {
+		$(this).toggleClass(CLASS_TOGGLING);
 	}
 }
 
