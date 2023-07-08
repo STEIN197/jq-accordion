@@ -1,5 +1,7 @@
 import $ from "jquery";
 
+// TODO: Add options ({duration: number;})
+const MODE_DEFAULT: Mode = "single";
 const CLASS_ACCORDION = "jq-accordion";
 const CLASS_ITEM = "jq-accordion-item";
 const CLASS_BUTTON = "jq-accordion-button";
@@ -13,7 +15,7 @@ $.fn.accordion = function (this: JQuery<HTMLElement>) {
 	this.delegate("." + CLASS_BUTTON, "click", onButtonClick);
 }
 
-function onButtonClick(this: HTMLElement, e: any) {
+function onButtonClick(this: JQuery<HTMLElement>, e: any) {
 	e.preventDefault();
 	Item.toggle(Button.getItem(this));
 }
@@ -31,18 +33,18 @@ function toggleBodiesVisibility(): void {
 
 namespace Accordion {
 
-	export function getMode(element: HTMLElement): Mode {
-		return element.getAttribute("data-mode") as Mode || "single";
+	export function getMode($element: JQuery<HTMLElement>): Mode {
+		return $element.attr("data-mode") as Mode || MODE_DEFAULT;
 	}
 
-	export function getExpandedItem(accordion: HTMLElement): HTMLElement | null {
-		const items = $(accordion).find("." + CLASS_ITEM).toArray();
+	export function getExpandedItem($accordion: JQuery<HTMLElement>): JQuery<HTMLElement> | null {
+		const items = $accordion.find("." + CLASS_ITEM).toArray();
 		const depths = items.map(item => $(item).parents().length);
-		const lowestDepth = Math.min.apply(null, depths);
-		for (const i in items) {
-			const $item = $(items[i]);
+		const lowestDepth = Math.min(...depths);
+		for (const item of items) {
+			const $item = $(item);
 			if ($item.parents().length === lowestDepth && $item.hasClass(CLASS_EXPANDED))
-				return $item[0];
+				return $item;
 		}
 		return null;
 	}
@@ -50,62 +52,69 @@ namespace Accordion {
 
 namespace Item {
 
-	export function getAccordion(item: HTMLElement): HTMLElement | null {
-		const $accordion = $(item).closest("." + CLASS_ACCORDION);
-		return $accordion.length ? $accordion[0] : null;
+	export function getAccordion($item: JQuery<HTMLElement>): JQuery<HTMLElement> | null {
+		const $accordion = $item.closest("." + CLASS_ACCORDION);
+		return $accordion.length ? $accordion : null;
 	}
 
-	export function getBody(item: HTMLElement): HTMLElement | null {
-		const bodies = $(item).find("." + CLASS_BODY).toArray();
+	export function getBody($item: JQuery<HTMLElement>): JQuery<HTMLElement> | null {
+		const bodies = $item.find("." + CLASS_BODY).toArray();
 		if (!bodies.length)
 			return null;
 		let $body = $(bodies[0]);
 		for (var i = 1; i < bodies.length; i++) {
-			var $tmpBody = $(bodies[i]);
+			const $tmpBody = $(bodies[i]);
 			if ($tmpBody.parents().length < $body.parents().length)
 				$body = $tmpBody;
 		}
-		return $body[0];
+		return $body;
 	}
 
-	export function toggle(element: HTMLElement): void {
-		if (isToggling(element))
+	export function toggle($element: JQuery<HTMLElement>): void {
+		if (isToggling($element))
 			return;
-		const $element = $(element);
 		$element.trigger("accordion:beforeToggle");
-		$(getBody(element)!).slideToggle(400, onSlideComplete);
-		const accordion = getAccordion(element)!;
-		if (Accordion.getMode(accordion) === "single" && !isExpanded(element)) {
-			const expandedItem = Accordion.getExpandedItem(element);
-			if (expandedItem) {
-				$(expandedItem).removeClass(CLASS_EXPANDED).addClass(CLASS_COLLAPSED);
-				$(getBody(expandedItem)!).slideUp(400, onSlideComplete);
+		const $body = getBody($element);
+		if (!$body)
+			throw new Error("There is no body in the item");
+		$body.slideToggle(400, onSlideComplete);
+		const $accordion = getAccordion($element);
+		if (!$accordion)
+			throw new Error("There is no accordion for the item");
+		if (Accordion.getMode($accordion) === "single" && !isExpanded($element)) {
+			const $expandedItem = Accordion.getExpandedItem($element);
+			if ($expandedItem) {
+				$expandedItem.removeClass(CLASS_EXPANDED).addClass(CLASS_COLLAPSED);
+				const $expandedBody = getBody($expandedItem);
+				if (!$expandedBody)
+					throw new Error("There is no body in the expanded item");
+				$expandedBody.slideUp(400, onSlideComplete);
 			}
 		}
 		$element.toggleClass(CLASS_COLLAPSED).toggleClass(CLASS_EXPANDED);
-		$element.trigger("accordion:afterToggle");
+		$element.trigger("accordion:afterToggle"); // TODO: Trigger on slide complete
 	}
 
-	export function isToggling(element: HTMLElement): boolean {
-		return $(getBody(element)!).hasClass(CLASS_TOGGLING);
+	export function isToggling($element: JQuery<HTMLElement>): boolean {
+		const $body = getBody($element);
+		if (!$body)
+			throw new Error("There is no body in the item");
+		return $body.hasClass(CLASS_TOGGLING);
 	}
 
-	export function isExpanded(element: HTMLElement): boolean {
-		return $(element).hasClass(CLASS_EXPANDED);
+	export function isExpanded($element: JQuery<HTMLElement>): boolean {
+		return $element.hasClass(CLASS_EXPANDED);
 	}
 
 	function onSlideComplete(this: HTMLElement): void {
-		$(this).toggleClass(CLASS_TOGGLING);
+		$(this).toggleClass(CLASS_TOGGLING); // TODO: Add class to an item, not to a body
 	}
 }
 
 namespace Button {
 	
-	export function getItem(element: HTMLElement): HTMLElement {
-		const $item = $(element).closest("." + CLASS_ITEM);
-		if (!$item.length)
-			throw new Error("There is no item for this button");
-		return $item[0];
+	export function getItem($element: JQuery<HTMLElement>): JQuery<HTMLElement> {
+		return $element.closest("." + CLASS_ITEM);
 	}
 }
 
