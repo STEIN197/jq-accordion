@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "jQuery accordion",
   "main": "index.js",
+  "scripts": {
+    "clean": "del *.js *.d.ts *.map 2>nul",
+    "build": "tsc index.ts --declaration --esModuleInterop --sourceMap --inlineSources"
+  },
   "keywords": [
     "jquery",
     "accordion"
@@ -14,5 +18,8 @@
   },
   "peerDependencies": {
     "jquery": "^3.7.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
   }
 }
