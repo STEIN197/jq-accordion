@@ -5,12 +5,19 @@
   "main": "index.js",
   "scripts": {
     "clean": "del *.js *.d.ts *.map 2>nul",
-    "build": "tsc index.ts --declaration --esModuleInterop --sourceMap --inlineSources"
+    "build": "tsc index.ts --declaration --sourceMap --inlineSources --module commonjs --target esnext",
+	"browserify": "browserify index.js --outfile jquery.accordion.js"
   },
   "keywords": [
     "jquery",
     "accordion"
   ],
+  "browserify": {
+    "transform": "browserify-shim"
+  },
+  "browserify-shim": {
+    "jquery": "global:$"
+  },
   "author": "Nail Gafarov",
   "license": "MIT",
   "dependencies": {
@@ -20,6 +27,8 @@
     "jquery": "^3.7.0"
   },
   "devDependencies": {
+    "browserify": "^17.0.0",
+    "browserify-shim": "^3.8.16",
     "typescript": "^5.1.6"
   }
 }
