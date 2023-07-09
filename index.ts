@@ -1,4 +1,4 @@
-import $ from "jquery";
+import * as $ from "jquery";
 
 // TODO: Add options ({duration: number;})
 const MODE_DEFAULT: Mode = "single";
