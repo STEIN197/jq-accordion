@@ -2,6 +2,7 @@ import $ from "jquery";
 
 // TODO: Add options ({duration: number;})
 const MODE_DEFAULT: Mode = "single";
+const SLIDE_DURATION_DEFAULT = 400;
 const CLASS_ACCORDION = "jq-accordion";
 const CLASS_ITEM = "jq-accordion-item";
 const CLASS_BUTTON = "jq-accordion-button";
@@ -95,22 +96,21 @@ namespace Item {
 		const $body = getBody($element);
 		if (!$body)
 			throw new Error("There is no body in the item");
-		$body.slideToggle(400, onSlideComplete);
+		$body.slideToggle(SLIDE_DURATION_DEFAULT, Body.onSlideComplete);
 		const $accordion = getAccordion($element);
 		if (!$accordion)
 			throw new Error("There is no accordion for the item");
 		if (Accordion.getMode($accordion) === "single" && !isExpanded($element)) {
-			const $expandedItem = Accordion.getExpandedItem($element);
-			if ($expandedItem) {
+			const $items = Accordion.getExpandedItems($element);
+			for (const $expandedItem of $items) {
 				$expandedItem.removeClass(CLASS_EXPANDED).addClass(CLASS_COLLAPSED);
 				const $expandedBody = getBody($expandedItem);
 				if (!$expandedBody)
 					throw new Error("There is no body in the expanded item");
-				$expandedBody.slideUp(400, onSlideComplete);
+				$expandedBody.slideUp(SLIDE_DURATION_DEFAULT, Body.onSlideComplete);
 			}
 		}
 		$element.toggleClass(CLASS_COLLAPSED).toggleClass(CLASS_EXPANDED);
-		$element.trigger(EVENT_TOGGLE_AFTER); // TODO: Trigger on slide complete
 	}
 
 	export function isToggling($item: JQuery<HTMLElement>): boolean {
@@ -123,9 +123,16 @@ namespace Item {
 	export function isExpanded($element: JQuery<HTMLElement>): boolean {
 		return $element.hasClass(CLASS_EXPANDED);
 	}
+}
 
-	function onSlideComplete(this: HTMLElement): void {
-		$(this).toggleClass(CLASS_TOGGLING).trigger(EVENT_TOGGLE_AFTER); // TODO: Add class to an item, not to a body
+namespace Body {
+
+	export function onSlideComplete(this: HTMLElement): void {
+		const $this = $(this);
+		const $item = getItem($this);
+		if (!$item)
+			throw new Error("There is no item for the body");
+		$item.toggleClass(CLASS_TOGGLING).trigger(EVENT_TOGGLE_AFTER);
 	}
 }
 
