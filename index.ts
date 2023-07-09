@@ -27,12 +27,14 @@ function onButtonClick(this: JQuery<HTMLElement>, e: any) {
 }
 
 function toggleBodiesVisibility(): void {
-	$("." + CLASS_BODY).each(function () {
-		const $body = $(this);
-		const $item = $body.closest("." + CLASS_ITEM);
-		if ($item.hasClass(CLASS_EXPANDED))
+	$("." + CLASS_ITEM).each(function () {
+		const $this = $(this);
+		const $body = Item.getBody($this);
+		if (!$body)
+			return;
+		if ($this.hasClass(CLASS_EXPANDED))
 			$body.slideDown();
-		if ($item.hasClass(CLASS_COLLAPSED))
+		if ($this.hasClass(CLASS_COLLAPSED))
 			$body.slideUp();
 	});
 }
