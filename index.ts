@@ -114,10 +114,7 @@ namespace Item {
 	}
 
 	export function isToggling($item: JQuery<HTMLElement>): boolean {
-		const $body = getBody($item);
-		if (!$body)
-			throw new Error("There is no body in the item");
-		return $body.hasClass(CLASS_TOGGLING);
+		return $item.hasClass(CLASS_TOGGLING);
 	}
 
 	export function isExpanded($element: JQuery<HTMLElement>): boolean {
