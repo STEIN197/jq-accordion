@@ -137,7 +137,29 @@ namespace Body {
 
 declare global {
 	interface JQuery {
-		// TODO: Docs, tests
+
+		/**
+		 * Create accordions inside the selected container.
+		 * @example
+		 * ```html
+		 * <ul class="jq-accordion" data-mode="multiple">
+		 * 	<li class="jq-accordion-item collapsed">
+		 * 		<button class="jq-accordion-button">Toggle</button>
+		 * 		<div class="jq-accordion-body">...</div>
+		 * 	</li>
+		 * 	<li class="jq-accordion-item expanded">
+		 * 		<button class="jq-accordion-button">Toggle</button>
+		 * 		<div class="jq-accordion-body">...</div>
+		 * 	</li>
+		 * </ul>
+		 * <script>
+		 * 	$(body).accordion();
+		 * 	$(".jq-accordion-item").on("accordion.toggle.before", () => console.log("An item is toggling"));
+		 * 	$(".jq-accordion-item").on("accordion.toggle.after", () => console.log("An item has just been toggled"));
+		 * </script>
+		 * ```
+		 */
+		// TODO: Tests
 		accordion(this: JQuery<HTMLElement>): void;
 	}
 }
