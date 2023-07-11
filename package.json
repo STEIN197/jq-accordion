@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "clean": "del *.js *.d.ts *.map 2>nul",
-    "build": "tsc index.ts --declaration --sourceMap --inlineSources --module commonjs --target esnext",
-	"browserify": "browserify index.js --outfile jquery.accordion.js"
+    "ts": "tsc index.ts --declaration --sourceMap --inlineSources --module commonjs --target esnext",
+    "browserify": "browserify index.js --outfile jquery.accordion.js",
+    "build": "npm run ts && npm run browserify"
   },
   "keywords": [
     "jquery",
